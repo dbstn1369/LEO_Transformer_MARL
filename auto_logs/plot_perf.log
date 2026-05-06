@@ -1,0 +1,11 @@
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+-- Plotting figures (reference paper style) --
+Saved  figures/fig1_convergence
+Saved  figures/fig_convergence_hp
+Saved  figures/fig3_perf_starlink
+Saved  figures/fig4_perf_mega
+
+Done. Figures -> ./figures/

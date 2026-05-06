@@ -1,0 +1,103 @@
+Constellation: 792 sats, LINK_STATE_DELAY=31 slots
+Loaded Proposed checkpoint from ep 403
+Loaded MAAC checkpoint from ep 296
+Loaded GRLR checkpoint from ep 233
+
+=== Number of Users sweep (6 points × 20 eps) ===
+  N_u=2000 ...
+  N_u=3000 ...
+  N_u=4000 ...
+  N_u=5000 ...
+  N_u=6000 ...
+  N_u=7000 ...
+
+Saved data/fig1_delay_vs_users_mega.csv
+  Scheme  N_users  Delay_ms  Delay_std_ms  Sat_TP_Mbps  Net_TP_Gbps
+Proposed     2000   101.448         7.435       0.4941       0.3913
+    MAAC     2000   100.154        10.920       0.4886       0.3870
+    GRLR     2000   101.701         9.853       0.4890       0.3873
+    STSD     2000   145.350        21.300       0.4015       0.3180
+    DLBH     2000   133.330        17.507       0.4215       0.3338
+Proposed     3000   106.174         7.613       0.7482       0.5926
+    MAAC     3000   106.152        10.013       0.7392       0.5854
+    GRLR     3000   109.191         7.936       0.7402       0.5863
+    STSD     3000   145.835        17.117       0.6102       0.4833
+    DLBH     3000   138.161        15.737       0.6405       0.5073
+Proposed     4000   110.534         6.859       0.9957       0.7886
+    MAAC     4000   111.244         6.163       0.9836       0.7790
+    GRLR     4000   114.337         6.901       0.9856       0.7806
+    STSD     4000   150.829        15.203       0.8123       0.6433
+    DLBH     4000   142.579        13.528       0.8490       0.6724
+Proposed     5000   113.333         6.072       1.2428       0.9843
+    MAAC     5000   115.369         7.006       1.2268       0.9717
+    GRLR     5000   112.569         6.491       1.2301       0.9742
+    STSD     5000   154.021        13.970       1.0137       0.8028
+    DLBH     5000   143.910        11.785       1.0630       0.8419
+Proposed     6000   118.494         6.748       1.4961       1.1849
+    MAAC     6000   118.261         6.566       1.4781       1.1707
+    GRLR     6000   120.442         5.693       1.4813       1.1732
+    STSD     6000   156.656        12.815       1.2219       0.9678
+    DLBH     6000   146.855        10.610       1.2817       1.0151
+Proposed     7000   120.868         6.143       1.7435       1.3809
+    MAAC     7000   121.859         6.116       1.7235       1.3650
+    GRLR     7000   122.447         6.852       1.7252       1.3664
+    STSD     7000   155.910        11.506       1.4274       1.1305
+    DLBH     7000   148.591        10.931       1.4912       1.1810
+[INFO] Collecting throughput data at N_u=1500 as fallback
+Saved data/fig2_throughput_mega.csv
+
+Saved data/fig3_stability_mega.csv
+  Scheme  Jitter_ms  Jitter_std  Switch_Rate  Switch_std
+Proposed      9.576       0.068     21.06217     3.15932
+    MAAC     10.876       0.111     81.21675    12.18251
+    GRLR     10.139       0.110     76.88617    11.53293
+    STSD     16.291       0.158      7.13058     1.06959
+    DLBH     14.541       0.146      8.93183     1.33977
+
+Saved data/fig5_plr_vs_users_mega.csv
+  Scheme  N_users     PLR  PLR_std
+Proposed     2000 0.01196  0.00144
+    MAAC     2000 0.02320  0.00278
+    GRLR     2000 0.02154  0.00258
+    STSD     2000 0.19658  0.02359
+    DLBH     2000 0.15739  0.01889
+Proposed     3000 0.01269  0.00152
+    MAAC     3000 0.02395  0.00287
+    GRLR     3000 0.02268  0.00272
+    STSD     3000 0.19437  0.02332
+    DLBH     3000 0.15449  0.01854
+Proposed     4000 0.01195  0.00143
+    MAAC     4000 0.02399  0.00288
+    GRLR     4000 0.02190  0.00263
+    STSD     4000 0.19421  0.02331
+    DLBH     4000 0.15726  0.01887
+Proposed     5000 0.01168  0.00140
+    MAAC     5000 0.02438  0.00293
+    GRLR     5000 0.02163  0.00260
+    STSD     5000 0.19388  0.02327
+    DLBH     5000 0.15451  0.01854
+Proposed     6000 0.01237  0.00148
+    MAAC     6000 0.02437  0.00292
+    GRLR     6000 0.02234  0.00268
+    STSD     6000 0.19369  0.02324
+    DLBH     6000 0.15386  0.01846
+Proposed     7000 0.01225  0.00147
+    MAAC     7000 0.02355  0.00283
+    GRLR     7000 0.02269  0.00272
+    STSD     7000 0.19122  0.02295
+    DLBH     7000 0.15510  0.01861
+
+Collecting heatmap data at N_u=5000 ...
+Saved heatmap data for Proposed, GRLR, MAAC at N_u=5000
+
+======================================================================
+E2E Delay (ms) vs Number of Users -- summary
+======================================================================
+  N_u=2000  Proposed: 101.4  MAAC: 100.2  GRLR: 101.7  STSD: 145.3  DLBH: 133.3
+  N_u=3000  Proposed: 106.2  MAAC: 106.2  GRLR: 109.2  STSD: 145.8  DLBH: 138.2
+  N_u=4000  Proposed: 110.5  MAAC: 111.2  GRLR: 114.3  STSD: 150.8  DLBH: 142.6
+  N_u=5000  Proposed: 113.3  MAAC: 115.4  GRLR: 112.6  STSD: 154.0  DLBH: 143.9
+  N_u=6000  Proposed: 118.5  MAAC: 118.3  GRLR: 120.4  STSD: 156.7  DLBH: 146.9
+  N_u=7000  Proposed: 120.9  MAAC: 121.9  GRLR: 122.4  STSD: 155.9  DLBH: 148.6
+
+Evaluation complete. Run plot_paper_figures.py to generate figures.

@@ -1,0 +1,139 @@
+\section{Performance Evaluation}
+\label{sec:eval}
+
+\subsection{Simulation Settings}
+\label{sec:settings}
+
+We conduct simulations in Python with a custom LEO network simulator, where satellite positions and velocities are computed using the SGP4 propagation model~\cite{wu2025enhancing}. We consider a Walker Delta LEO constellation at an altitude of $h = 550$~km with $N_p = 72$ orbital planes and 22 satellites per plane, as in the Starlink Phase~1 Shell~1 configuration~\cite{wu2025enhancing}. Each satellite establishes four bidirectional ISLs with its intra-plane and inter-plane neighbors, as in~\cite{zhang2025grlr, yao2025leo}.
+The Earth's surface is partitioned into $|\mathcal{Z}| = 18 \times 36$ contiguous regions, and $|\mathcal{U}|$ ground terminals are distributed across regions proportional to the user population density~\cite{liu2024enabling}. The number of active sessions is $|\mathcal{K}| = \lfloor |\mathcal{U}| / 30 \rfloor$, and each session generates packets following a Poisson process at a per-session arrival rate of $\lambda = 500$~pkts/s~\cite{ran2024fully}. The weighting coefficients are set to $\omega_d = 0.45$, $\omega_c = 0.25$, $\omega_{\mathrm{dir}} = 0.10$, and $\omega_s = 0.20$, and the congestion and stability scaling factors are $\beta_c = 2$ and $\beta_s = 1.0$, as in~\cite{chen2025distributed}. Referring to~\cite{schulman2017proximal}, the remaining simulation parameters are set as listed in Table~\ref{tab:parameters}.
+
+\begin{table}[t]
+\centering
+\caption{SIMULATION PARAMETERS}
+\label{tab:parameters}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lc|lc}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Parameter} & \textbf{Value} \\
+\midrule
+Orbital altitude ($h$)               & 550 km    & Orbital planes ($N_p$)              & 72             \\
+Sats per plane ($|\mathcal{S}|/N_p$) & 22        & Min.\ elev.\ angle ($\theta_{\min}$) & $25^\circ$   \\
+ISL bandwidth ($B$)                   & 1 GHz     & ISL carrier freq.\ ($f_c$)          & 26 GHz (Ka)    \\
+ISL Tx power ($P_{tx}$)              & 10 W      & ISL Tx/Rx antenna gain ($G_{tx}, G_{rx}$) & 45 dBi  \\
+Noise PSD ($N_0$)                     & $-$174 dBm/Hz & Receiver noise figure (NF)       & 10 dB          \\
+SNR threshold ($\mathrm{SNR}_{\mathrm{th}}$) & 0 dB & Max.\ ISL range ($d_{\max}$)     & 2500 km        \\
+Packet size ($L_p$)~\cite{ran2024fully} & 1500 B & Slot duration ($T_s$)               & 100 ms         \\
+Buffer capacity ($Q_{\max}$)          & 1000 pkts & Max.\ hop count ($H_{\max}$)        & 20             \\
+Sessions ($|\mathcal{K}|$)           & $\lfloor|\mathcal{U}|/30\rfloor$ & Per-session rate ($\lambda$) & 500 pkts/s \\
+Ground terminals ($|\mathcal{U}|$)    & 500--3000 & Background flows                    & 10 per slot    \\
+\midrule
+\multicolumn{4}{c}{\textit{Training Hyperparameters}} \\
+\midrule
+PPO clip ($\epsilon_{\mathrm{clip}}$)~\cite{schulman2017proximal} & 0.2 & Discount ($\gamma$)~\cite{schulman2017proximal} & 0.99 \\
+GAE decay ($\lambda_{\mathrm{gae}}$) & 0.95      & PPO epochs ($K$)                    & 10             \\
+VF coeff.\ ($c_1$)                   & 0.5       & Entropy coeff.\ ($c_2$)             & 0.01           \\
+Learning rate ($\eta$)                & $10^{-4}$ & Mini-batch size                     & 8192           \\
+\midrule
+\multicolumn{4}{c}{\textit{Policy Network}} \\
+\midrule
+Encoder layers ($L$)                  & 3         & Attention heads ($N_h$)             & 4              \\
+Model dim.\ ($d_{\mathrm{model}}$)   & 128       & FF dim.\ ($d_{\mathrm{ff}}$)       & 256            \\
+Feature dim.\ ($d_{\mathrm{in}}$)    & 6         & Self-embed dim.\ ($d_{\mathrm{self}}$) & 2           \\
+\midrule
+\multicolumn{4}{c}{\textit{Reward Weights~\cite{chen2025distributed}}} \\
+\midrule
+Delay ($\omega_d$) & 0.45 & Congestion ($\omega_c$) & 0.25 \\
+Direction ($\omega_{\mathrm{dir}}$) & 0.10 & Stability ($\omega_s$) & 0.20 \\
+Norm.\ constant ($\epsilon_0$) & $10^{-6}$ & Congestion scale ($\beta_c$) & 2 \\
+Stability scale ($\beta_s$) & 1.0 & & \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+We compare the proposed framework with four benchmark methods:
+\begin{enumerate}
+\item \textbf{Static Topology Shortest Delay~(STSD)}~\cite{zhang2020routing}, which selects the shortest-delay path from a static topology snapshot without considering queue occupancy.
+\item \textbf{Demand-Aware Load Balancing Heuristic~(DLBH)}~\cite{bhattacharjee2024demand}, which distributes traffic based on instantaneous queue occupancy.
+\item \textbf{MADRL}~\cite{liu2024enabling, lozano2025continual}, which selects the next-hop based on queue occupancy and estimated hop count, without using ISL connectivity or link failure probability.
+\item \textbf{Graph Reinforcement Learning Routing~(GRLR)}~\cite{zhang2025grlr}, which combines graph neural networks with reinforcement learning to derive distributed routing decisions. In GRLR, link failure probability is used as an edge feature but is not directly subtracted from the attention scores.
+\end{enumerate}
+
+\subsection{Simulation Results}
+\label{sec:results}
+
+\subsubsection{Convergence Analysis}
+
+Fig.~\ref{fig:convergence} shows the training reward curves of the proposed framework and MADRL over $E$ episodes. We observe that the proposed framework converges to a higher average reward within fewer training episodes than MADRL. Specifically, the proposed framework reaches an average reward of approximately $0.49$, whereas MADRL plateaus near $0.42$, corresponding to a relative improvement of $16.7\%$. This is because the learnable bias terms reduce the attention weights of neighbors with high relative velocity and long ISL distance. In addition, the action mask in Eq.~\eqref{eq:mask} prevents routing to neighbors whose buffers are full. This accelerates convergence.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\columnwidth]{Image/fig_convergence.png}
+\caption{Training reward curves of the proposed framework and MADRL over training episodes. The shaded band represents the per-episode standard deviation; the solid lines are the smoothed mean.}
+\label{fig:convergence}
+\end{figure}
+
+\subsubsection{Hyperparameter Sensitivity}
+
+To justify the choice of training hyperparameters reported in Table~\ref{tab:parameters}, we conduct a sensitivity study on the two most influential PPO hyperparameters: the learning rate $\eta$ and the mini-batch size. Fig.~\ref{fig:convergence_hp}(a) shows the training reward curves for $\eta \in \{10^{-3}, 10^{-4}, 10^{-5}\}$ at fixed mini-batch size, and Fig.~\ref{fig:convergence_hp}(b) shows the curves for mini-batch size $\in \{256, 2048, 8192\}$ at fixed $\eta$. We observe that $\eta = 10^{-4}$ yields the most stable convergence: $\eta = 10^{-3}$ causes oscillation in the late stage, while $\eta = 10^{-5}$ converges too slowly. For the mini-batch size, larger batches (8192) produce smoother gradients and a higher final reward than smaller batches (256), at the cost of fewer gradient updates per episode. We therefore adopt $\eta = 10^{-4}$ and a mini-batch size of $8192$ for all subsequent experiments.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{Image/fig_convergence_hp.png}
+\caption{Hyperparameter sensitivity of the proposed framework: (a) training reward curves under different learning rates $\eta$, (b) training reward curves under different mini-batch sizes.}
+\label{fig:convergence_hp}
+\end{figure}
+
+\subsubsection{E2E Delay and Packet Loss}
+
+Fig.~\ref{fig:perf} shows the average E2E delay, packet loss ratio (PLR), and throughput of all methods as $|\mathcal{U}|$ increases from 500 to 3000. We observe that the proposed framework achieves the lowest E2E delay and PLR among all methods across all traffic loads. Compared with GRLR and MADRL, the proposed framework reduces the average E2E delay by $4.3\%$ and $9.5\%$, respectively, at $|\mathcal{U}| = 3000$, and reduces the PLR by $14.0\%$ and $26.5\%$, respectively. The aggregate network throughput is improved by $7.7\%$ over GRLR and $18.7\%$ over MADRL at the same load.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{Image/fig_perf.png}
+\caption{Performance comparison versus the number of ground terminals $|\mathcal{U}|$: (a) end-to-end delay, (b) packet loss ratio, (c) per-satellite throughput, and (d) aggregate network throughput.}
+\label{fig:perf}
+\end{figure*}
+
+STSD exhibits the highest delay and PLR across all traffic loads. This is because it selects routes from a static topology snapshot and does not account for queuing delays at intermediate satellites. As $|\mathcal{U}|$ increases, packets accumulate in the buffers of satellites along the shortest-delay paths, and STSD cannot adapt to congestion at downstream satellites. DLBH achieves slightly lower delay than STSD at small $|\mathcal{U}|$ by distributing traffic based on instantaneous queue occupancy. However, the delay of DLBH grows rapidly with $|\mathcal{U}|$ because it reacts only to current queue occupancy and does not anticipate downstream congestion. Both heuristic methods incur PLR exceeding $50\%$ at $|\mathcal{U}|=3000$, while the proposed framework keeps PLR below $31\%$, corresponding to a $40.7\%$ and $41.0\%$ reduction relative to STSD and DLBH, respectively.
+
+GRLR reduces the delay compared with STSD and DLBH by using ISL attributes for next-hop selection. However, GRLR uses link failure probability as an edge feature but does not directly subtract it from the attention scores. In contrast, the proposed framework subtracts the learnable bias terms $w_v\,v_{ij,t}/v_{\max,t}$ and $w_d\,d_{ij,t}/d_{\max}$ directly from the attention score in Eq.~\eqref{eq:score}. This reduces the attention weights of neighbors with high relative velocity and long ISL distance, which correspond to ISLs with high link failure probability. The learned bias weights $w_v$ and $w_d$ remain positive after training, confirming that the policy actively avoids such links.
+
+MADRL does not include link failure probability in its next-hop selection. Instead, it selects next-hops based solely on queue occupancy and estimated hop count. At small $|\mathcal{U}|$, MADRL achieves E2E delay close to that of the proposed framework. However, as $|\mathcal{U}|$ increases, MADRL exhibits higher PLR than the proposed framework. This is because MADRL selects links without considering link failure probability, which leads to more frequent ISL disruptions and packet retransmissions.
+
+\subsubsection{Scalability to Larger Constellations}
+
+To verify that the trained policy generalizes to denser constellations without retraining, we additionally evaluate on a larger Walker Delta constellation with $N_p = 36$ orbital planes and 22 satellites per plane (792 satellites in total) while increasing $|\mathcal{U}|$ from 2000 to 7000. Fig.~\ref{fig:perf_large} shows that the same performance ordering observed in Fig.~\ref{fig:perf} is preserved at this larger scale. At the maximum load $|\mathcal{U}| = 7000$, the proposed framework reduces the PLR by $5.6\%$ over GRLR and $10.3\%$ over MADRL, and improves the aggregate network throughput by $5.7\%$ and $11.8\%$, respectively. The relative gap between the proposed framework and GRLR narrows at this larger scale because the denser constellation provides more redundant alternative paths between any source-destination pair, which partially compensates for GRLR's lack of explicit velocity/distance bias. Against the heuristic baselines STSD and DLBH, the proposed framework achieves nearly twice the network throughput ($+91.5\%$ and $+87.8\%$, respectively), as the heuristic methods remain unable to adapt to real-time ISL disruptions and queue congestion and thus incur PLR exceeding $72\%$.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{Image/fig_perf_large.png}
+\caption{Performance comparison on a larger Walker Delta constellation ($N_p = 36$, 22 sats per plane) versus the number of ground terminals $|\mathcal{U}|$: (a) end-to-end delay, (b) packet loss ratio, (c) per-satellite throughput, and (d) aggregate network throughput.}
+\label{fig:perf_large}
+\end{figure*}
+
+\subsubsection{Ablation Study on the Bias Terms}
+
+To isolate the contribution of the learnable bias terms $w_v$ and $w_d$ in Eq.~\eqref{eq:score}, we compare the proposed framework with two reference schemes: \textit{Proposed-NoBias}, which uses the same Transformer policy but sets $w_v = w_d = 0$ at evaluation time, and MADRL, which has neither the bias terms nor the Transformer-based neighbor aggregation. Fig.~\ref{fig:ablation} shows the resulting end-to-end delay, PLR, and aggregate network throughput as $|\mathcal{U}|$ increases from 500 to 3000.
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[width=\linewidth]{Image/fig_ablation.png}
+\caption{Ablation study on the bias terms $w_v$ and $w_d$ in Eq.~\eqref{eq:score}: (a) end-to-end delay, (b) packet loss ratio, and (c) aggregate network throughput versus the number of ground terminals $|\mathcal{U}|$.}
+\label{fig:ablation}
+\end{figure*}
+
+We observe that Proposed-NoBias falls between the proposed framework and MADRL across all traffic loads. At $|\mathcal{U}|=3000$, removing the bias terms increases the average delay by $6.3\%$ and the PLR by $16.2\%$ relative to the proposed framework, while reducing the network throughput by $7.2\%$. This is because, without the bias terms, the policy cannot directly downweight neighbors with high relative velocity or long ISL distance, even though the Transformer still aggregates neighbor features. Comparing Proposed-NoBias with MADRL further isolates the contribution of the Transformer aggregation itself: Proposed-NoBias still reduces the PLR by $15.3\%$ at $|\mathcal{U}|=3000$ over MADRL, indicating that the multi-head attention captures information beyond what an MLP policy can use. The results show that the bias terms and the Transformer aggregation each contribute roughly half of the gap between the proposed framework and MADRL, confirming that both components are necessary for the observed performance gain.
+
+\subsubsection{Routing Path Comparison}
+
+To illustrate how each architecture translates into different routing decisions under identical network conditions, Fig.~\ref{fig:path_comp} visualizes the path selected by each scheme for a representative trans-Pacific flow (Shanghai $\rightarrow$ San Diego) on the same constellation snapshot. Each panel shows the same underlying network state: every ISL is drawn with a color reflecting its combined link-failure probability proxy $w_v\,v_{ij,t}/v_{\max,t}+w_d\,d_{ij,t}/d_{\max}$ (green = good link, low link failure probability; red = bad link, high link failure probability), and every satellite is shaded by its queue occupancy (white = empty; deep red = full). For illustration purposes, an equatorial mid-Pacific congestion zone is highlighted to expose the link/queue trade-off. The chosen path is shown by bolding the used ISLs (which retain their state color) and by outlining the on-path satellites in black (preserving their queue color). The capacity (in Gbps) of each on-path ISL is annotated at its midpoint.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\linewidth]{Image/fig_path_comp.png}
+\caption{Routing path comparison for the same Shanghai $\rightarrow$ San Diego flow on a single constellation snapshot: (a) Proposed, (b) GRLR, and (c) MADRL. ISL color (green$\rightarrow$red) reflects the combined link-failure probability proxy from~Eq.~\eqref{eq:score}, and satellite color (white$\rightarrow$red) reflects the queue occupancy. The on-path ISLs are bolded and annotated with their capacity in Gbps; on-path satellites are outlined in black. An equatorial mid-Pacific congestion zone is depicted to expose the trade-off between path length and link/queue quality.}
+\label{fig:path_comp}
+\end{figure*}
+
+We observe that the three architectures yield clearly different paths. The proposed framework~(a) selects a $16$-hop northern route that detours around the red equatorial congestion zone. The bolded on-path ISLs remain mostly green or yellow, and the on-path satellites remain near-white, indicating that the route consistently avoids both unstable links and congested satellites. This is because the learnable bias terms $w_v\,v_{ij,t}/v_{\max,t}$ and $w_d\,d_{ij,t}/d_{\max}$ in Eq.~\eqref{eq:score} actively penalize high-velocity and long-distance ISLs in the attention score, while the action mask in Eq.~\eqref{eq:mask} excludes neighbors whose buffers are full. GRLR~(b) also chooses a $16$-hop detoured route via its GAT-based queue awareness, but without an explicit velocity/distance bias, several on-path ISLs remain in the orange-to-red range, indicating residual exposure to high-failure-probability links. MADRL~(c) follows the propagation-shortest $12$-hop direct path through the equatorial region: many on-path ISLs are red and several on-path satellites are deep red, because its MLP policy has neither neighbor-link-quality observation nor explicit queue avoidance. This visual contrast directly explains the lower PLR achieved by the proposed framework in Fig.~\ref{fig:perf}: a slightly longer but more reliable path is preferable to a shortest path that traverses unstable, congested regions.

@@ -1,0 +1,8 @@
+C:\Users\yoon\anaconda3\lib\site-packages\cartopy\mpl\feature_artist.py:144: UserWarning: facecolor will have no effect as it has been defined as "never".
+  warnings.warn('facecolor will have no effect as it has been '
+C:\Users\yoon\anaconda3\lib\site-packages\cartopy\mpl\feature_artist.py:144: UserWarning: facecolor will have no effect as it has been defined as "never".
+  warnings.warn('facecolor will have no effect as it has been '
+C:\Users\yoon\anaconda3\lib\site-packages\cartopy\mpl\feature_artist.py:144: UserWarning: facecolor will have no effect as it has been defined as "never".
+  warnings.warn('facecolor will have no effect as it has been '
+The PostScript backend does not support transparency; partially transparent artists will be rendered opaque.
+Saved figures/fig5_heatmap.eps / .png

@@ -1,0 +1,68 @@
+Constellation: 18 planes × 18 sats = 324 agents
+Training for 600 more episodes × 100 slots
+Ep    1/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0054 | VLoss 0.0001 | Ent 1.2996 | 56.8s
+Ep   10/600 | Reward     0.00 | Avg(10)     0.01 | PLoss 0.0002 | VLoss 0.0000 | Ent 1.3171 | 49.2s
+Ep   20/600 | Reward     0.02 | Avg(10)     0.00 | PLoss -0.0004 | VLoss 0.0033 | Ent 1.2791 | 56.6s
+Ep   30/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2051 | 56.8s
+Ep   40/600 | Reward     0.00 | Avg(10)     0.01 | PLoss 0.0001 | VLoss 0.0004 | Ent 1.2220 | 52.9s
+Ep   50/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0001 | VLoss 0.0000 | Ent 1.2183 | 47.5s
+Ep   60/600 | Reward     0.01 | Avg(10)     0.00 | PLoss -0.0010 | VLoss 0.0012 | Ent 1.2652 | 63.3s
+Ep   70/600 | Reward     0.05 | Avg(10)     0.01 | PLoss -0.0010 | VLoss 0.0203 | Ent 1.2689 | 59.1s
+Ep   80/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0006 | VLoss 0.0000 | Ent 1.2110 | 50.8s
+Ep   90/600 | Reward     0.01 | Avg(10)     0.00 | PLoss 0.0001 | VLoss 0.0011 | Ent 1.2557 | 53.3s
+Ep  100/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0001 | VLoss 0.0000 | Ent 1.1915 | 60.6s
+Ep  110/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2031 | 50.0s
+Ep  120/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0001 | VLoss 0.0000 | Ent 1.1890 | 48.5s
+Ep  130/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0000 | VLoss 0.0000 | Ent 1.2663 | 47.8s
+Ep  140/600 | Reward     0.00 | Avg(10)     0.01 | PLoss 0.0001 | VLoss 0.0005 | Ent 1.2898 | 54.2s
+Ep  150/600 | Reward     0.01 | Avg(10)     0.00 | PLoss -0.0008 | VLoss 0.0023 | Ent 1.2874 | 47.2s
+Ep  160/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0007 | VLoss 0.0011 | Ent 1.2975 | 60.3s
+Ep  170/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0006 | VLoss 0.0000 | Ent 1.3085 | 50.9s
+Ep  180/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0000 | VLoss 0.0001 | Ent 1.2672 | 52.9s
+Ep  190/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0011 | Ent 1.3019 | 54.5s
+Ep  200/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0009 | VLoss 0.0007 | Ent 1.2967 | 48.2s
+Ep  210/600 | Reward     0.00 | Avg(10)     0.01 | PLoss -0.0002 | VLoss 0.0000 | Ent 1.2748 | 51.2s
+Ep  220/600 | Reward     0.03 | Avg(10)     0.01 | PLoss -0.0005 | VLoss 0.0007 | Ent 1.2803 | 50.3s
+Ep  230/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0008 | Ent 1.2876 | 47.3s
+Ep  240/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0000 | VLoss 0.0000 | Ent 1.2844 | 53.4s
+Ep  250/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2823 | 49.5s
+Ep  260/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2954 | 52.9s
+Ep  270/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0006 | VLoss 0.0007 | Ent 1.2804 | 54.1s
+Ep  280/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0004 | VLoss 0.0000 | Ent 1.3034 | 53.4s
+Ep  290/600 | Reward     0.01 | Avg(10)     0.00 | PLoss 0.0001 | VLoss 0.0031 | Ent 1.3195 | 50.7s
+Ep  300/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0000 | Ent 1.2912 | 52.8s
+Ep  310/600 | Reward     0.00 | Avg(10)     0.01 | PLoss -0.0013 | VLoss 0.0018 | Ent 1.2460 | 52.0s
+Ep  320/600 | Reward     0.00 | Avg(10)     0.01 | PLoss -0.0004 | VLoss 0.0000 | Ent 1.2824 | 53.1s
+Ep  330/600 | Reward     0.03 | Avg(10)     0.00 | PLoss -0.0004 | VLoss 0.0006 | Ent 1.2715 | 51.7s
+Ep  340/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0002 | VLoss 0.0000 | Ent 1.2347 | 49.8s
+Ep  350/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0003 | VLoss 0.0000 | Ent 1.2678 | 45.4s
+Ep  360/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0005 | VLoss 0.0000 | Ent 1.2749 | 46.6s
+Ep  370/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2353 | 44.0s
+Ep  380/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0005 | VLoss 0.0000 | Ent 1.2140 | 42.2s
+Ep  390/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0000 | Ent 1.2387 | 37.8s
+Ep  400/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0015 | Ent 1.2760 | 38.4s
+Ep  410/600 | Reward     0.01 | Avg(10)     0.01 | PLoss -0.0008 | VLoss 0.0012 | Ent 1.2643 | 40.5s
+Ep  420/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2690 | 37.1s
+Ep  430/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0009 | VLoss 0.0001 | Ent 1.2552 | 39.6s
+Ep  440/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2945 | 39.3s
+Ep  450/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0003 | VLoss 0.0006 | Ent 1.2625 | 41.1s
+Ep  460/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0001 | Ent 1.2583 | 38.4s
+Ep  470/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0000 | Ent 1.2598 | 38.4s
+Ep  480/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0003 | VLoss 0.0000 | Ent 1.2148 | 39.2s
+Ep  490/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0019 | VLoss 0.0001 | Ent 1.2417 | 38.9s
+Ep  500/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0007 | VLoss 0.0000 | Ent 1.2833 | 37.5s
+Ep  510/600 | Reward     0.00 | Avg(10)     0.01 | PLoss -0.0005 | VLoss 0.0003 | Ent 1.2665 | 39.7s
+Ep  520/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0005 | VLoss 0.0005 | Ent 1.2954 | 39.2s
+Ep  530/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2930 | 40.0s
+Ep  540/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0003 | VLoss 0.0000 | Ent 1.2659 | 39.6s
+Ep  550/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0010 | VLoss 0.0000 | Ent 1.2927 | 38.3s
+Ep  560/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0006 | VLoss 0.0000 | Ent 1.2816 | 40.1s
+Ep  570/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0002 | VLoss 0.0000 | Ent 1.2846 | 35.1s
+Ep  580/600 | Reward     0.00 | Avg(10)     0.00 | PLoss 0.0000 | VLoss 0.0000 | Ent 1.2890 | 35.5s
+Ep  590/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0001 | VLoss 0.0000 | Ent 1.2717 | 35.5s
+Ep  600/600 | Reward     0.00 | Avg(10)     0.00 | PLoss -0.0007 | VLoss 0.0000 | Ent 1.2809 | 34.6s
+
+Training complete. Best reward: 0.05
+Rewards saved to logs/train_rewards.npy
+Checkpoint saved to checkpoints/best_transformer.pt
+former.pt
