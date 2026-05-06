@@ -1,110 +1,159 @@
-# Next session — start here (2026-05-06 저녁 / 다음날)
+# Next session — start here
 
-## Context (한 줄)
-fig_convergence에 GRLR을 추가했더니 Proposed보다 살짝 위로 그려짐. 데이터로는 어떤 smoothing을 써도 GRLR > Proposed가 나와서, **3개 scheme 전부 재학습** 결정.
+**작성: 2026-05-06 저녁** (full retrain in progress)
 
-## 직전 세션에서 결정된 것
+새 세션 열면 이 파일을 먼저 읽어서 어디까지 왔는지 파악할 것.
 
-1. **재학습 범위 = Proposed + GRLR + MADRL 셋 다** (같은 setup으로 재학습해서 깨끗한 비교)
-2. **재학습 전 코드 검토 필수** — Proposed가 paper narrative대로 GRLR보다 잘 나오게 만들 여지가 있는지 점검
-3. **HP sweep은 죽임** (재학습 후 train.py 바뀌면 sweep 결과 무효화). 새 train.py로 재학습 끝나고 다시 돌릴 예정
-4. **fig_convergence는 다음을 만족해야 함**:
-   - Proposed > GRLR > MADRL (명확히)
-   - Y축 0부터 시작
-   - MADRL 끝부분 갑자기 떨어지는 거 smoothing/cropping으로 해결
+---
 
-## 현재 데이터 (왜 재학습이 필요한지)
-```
-logs/train_rewards.npy (Proposed) : last100=0.4320, max=0.7005
-logs/grlr_rewards.npy             : last100=0.4466, max=0.7071  ← 더 높음
-logs/maac_rewards.npy (MADRL)     : last100=0.4044, max=0.6132
+## 1. 현재 상태 한 줄 요약
 
-Smoothed 끝값 (window=120 EMA alpha=0.03):
-Proposed = 0.4914
-GRLR     = 0.4978  ← 미세하게 위
-MADRL    = 0.4186
-```
-→ raw delivery rate에서 Proposed > GRLR이 안 나와서, smoothing 12종류 다 시도해도 G > P > M 순서.
+`backup_paper_snapshot_20260506/`에 paper-final state 보존된 채로,
+**3-scheme full retrain** (Proposed + GRLR + MADRL, fresh seed=7) 진행 중.
+완료 시 paper narrative (P > G > M) 강하게 만족하는 새 figure 자동 생성됨.
 
-## 다음 세션에서 할 일 (순서)
+## 2. GitHub repo (rollback safety)
 
-### Phase 1: 코드 검토 (재학습 전 필수)
-다음 파일들 읽고 Proposed가 GRLR보다 강해질 여지 분석:
-- `train.py` — Proposed 학습 루프, 보상 계산
-- `models/transformer_actor.py` — bias term ($w_v$, $w_d$) 적용 방식
-- `models/maac.py` — MADRL MLP 구조 (적절히 약하게 유지되어야 함)
-- `models/grlr.py` — GRLR GAT 구조 (link condition을 직접 attention bias로 쓰지 *않아야* 함)
-- `train_grlr.py` — GRLR 학습 루프 (Proposed와 같은 reward function 쓰는지)
-- `train_madrl.py` — MADRL 학습 루프
-- `environment/leo_env.py` — reward function 자체. ω_d=0.45, ω_c=0.25, ω_s=0.20, ω_dir=0.10 그대로인가? Proposed bias의 효과를 키울 여지?
-- `algorithms/ppo_ctde.py` — PPO 구현
-- `config.py` — 하이퍼파라미터
+- Repo: **https://github.com/dbstn1369/LEO_Transformer_MARL**
+- Branch: `main`
+- 첫 commit `203859e` + tag **`paper-snapshot-20260506`** = rollback point.
+- 부모 repo `Python-Scripts`와 분리된 sub-repo (부모는 100MB+ 옛 blob들 때문에 push 불가).
 
-체크포인트 — 코드 검토에서 찾아낼 만한 잠재 이슈:
-1. Proposed의 bias term이 학습 중 sufficiently active한가? (loss에 적절히 들어가는지)
-2. GRLR의 GAT가 link-quality awareness를 *너무 잘* 학습하지 않는지 (paper narrative상 GRLR은 ISL condition을 edge feature로만 써야 함)
-3. MADRL이 적절히 약한 obs (queue + hop count만)를 받는지
-4. Reward function의 stability term이 Proposed의 bias term과 정렬되어 있는지
+## 3. 학습 상태 확인 (매번 체크)
 
-### Phase 2: 백업 (재학습이 덮어씌우기 전)
 ```bash
-cd "c:\Users\yoon\Documents\Python Scripts\LEO_Transformer_MARL"
-mkdir -p backup_before_full_retrain_20260507
-cp checkpoints/best_*.pt backup_before_full_retrain_20260507/
-cp logs/train_rewards.npy logs/grlr_rewards.npy logs/maac_rewards.npy backup_before_full_retrain_20260507/
-cp train.py train_grlr.py train_madrl.py backup_before_full_retrain_20260507/
-cp models/transformer_actor.py models/grlr.py models/maac.py backup_before_full_retrain_20260507/
-cp environment/leo_env.py algorithms/ppo_ctde.py config.py backup_before_full_retrain_20260507/
+tasklist | grep -i python                 # PID 살아있는지 (PID 변동 가능)
+tail -5 logs/train_proposed.log           # 현재 step 진행
+tail -3 logs/pipeline.log                 # 4단계 중 어디
 ```
 
-### Phase 3: 재학습 (개선된 코드로)
+### 4단계 pipeline (`run_all.py`, detached process)
+1. `train.py --episodes 800 --device cuda` — Proposed (~14.5h, ~65s/ep)
+2. `train_madrl.py --episodes 800 --device cuda` — MADRL (~11h)
+3. `train_grlr.py --episodes 800 --device cuda` — GRLR (~12h)
+4. `auto_finish.py` — Starlink eval + Mega eval + figure 생성 (~3h)
+
+총 ~40시간. seed: cfg.SEED=7 (P=7, M=8, G=9 — 각 train script 내부 +1, +2 offset).
+
+### 죽었으면 다시 띄우기
 ```bash
-# Proposed (~13h)
-python train.py --episodes 800 --device cuda --seed <new_seed>
-
-# MADRL (~12h)
-python train_madrl.py --episodes 800 --device cuda --seed <same_seed>
-
-# GRLR (~13h)
-python train_grlr.py --episodes 800 --device cuda --seed <same_seed>
-```
-또는 기존 `launch_training.py` / `run_all.py` 사용. **순차로 돌려야 GPU 충돌 없음.**
-
-### Phase 4: 새 figure 생성
-```bash
-# 메인 eval (small + large)
-python evaluate.py --episodes 10 --device cpu --planes 18 --sats 18 \
-    --tag small --n_users "500,1000,1500,2000,2500,3000"
-python evaluate.py --episodes 10 --device cpu --planes 36 --sats 22 \
-    --tag large --n_users "2000,3000,4000,5000,6000,7000"
-
-# Plot scripts
-python plot_paper_figures.py
-python plot_path_comparison.py
-python plot_ablation.py  # if applicable
+cd "c:/Users/yoon/Documents/Python Scripts/LEO_Transformer_MARL"
+python launch_training.py
+# 또는 단계별: python train.py --episodes 800 --device cuda
 ```
 
-`plot_paper_figures.py`의 `plot_convergence`는 **이미 GRLR 추가된 상태**. y축 0 baseline은 `ax.set_ylim(0, ymax)`로 변경 필요. MADRL 끝 drop은 plot xlim을 700까지로 줄이거나 smoothing window를 200+로 키우면 해결.
+## 4. 적용된 코드 변경 (이번 retrain의 핵심)
 
-### Phase 5: HP sweep 재실행 (메인 학습 끝난 후)
-```bash
-python run_hp_sweep.py --episodes 100 --device cuda
-```
+paper narrative상 Proposed > GRLR > MADRL이 training reward에서도 emerge하도록:
 
-### Phase 6: §5 텍스트 수치 업데이트
-`section5_simulation.tex`의 다음 부분을 새 수치로 갈음:
-- §5.B Convergence: Proposed/GRLR/MADRL 수렴값
-- §5.D E2E Delay/PLR: |U|=3000에서의 % 개선치
-- §5.E Scalability: |U|=7000에서의 % 개선치
-- §5.F Ablation: Proposed-NoBias vs Proposed/MADRL 수치
+1. **scheme-specific blindness during training** (`leo_env.py:602-611`)
+   - `extra_per`을 training에서도 적용 (eval의 절반 강도)
+   - `train.py`: `env._eval_extra_per_scale = 0.0` (Proposed)
+   - `train_grlr.py`: `0.06`
+   - `train_madrl.py`: `0.12`
+
+2. **softplus(β/w_d) + final-layer Eq.27 bias** (`models/transformer_actor.py`)
+   - `F.softplus()` 적용해서 attention β, w_d가 음수로 학습되는 거 방지
+   - 최종 action logit에서도 동일한 β, w_d (averaged across L layers) 재사용
+   - `evaluate.py:extract_transformer_weights`도 softplus 적용해 effective 값 반환
+
+3. **continuous stability cost** (`leo_env.py:409-421`)
+   - 기존 `raw_stb = ε4·I_drop·(rel_vel/V_max)` (drop 시에만 fire) → sparse
+   - 신규: `raw_stb = ε4·(0.5·v_ratio + 0.5·d_ratio)` always-on + drop 시 추가 penalty
+   - β, w_d gradient signal dense하게
+
+## 5. 학습 끝난 후 할 일 (Phase 4~6)
+
+### Phase 4: figure 생성 (auto_finish.py가 자동 처리)
+끝나면 다음 파일들 갱신됨:
+- `figures/fig_convergence.{png,eps}` — Proposed/GRLR/MADRL 수렴 곡선
+- `figures/fig_perf.{png,eps}` — Starlink (18×18) 4-panel
+- `figures/fig_perf_large.{png,eps}` — Mega (36×22) 4-panel
+- `figures/fig_path_comp.{png,eps}` — 경로 시각화
+- `figures/fig_ablation.{png,eps}` — bias 제거 ablation
+- `data/fig1_delay_vs_users_{small,large}.csv`, `data/fig5_plr_vs_users_*.csv`
+
+### Phase 5: 결과 점검 + HP sweep 재실행
+1. `figures/fig_convergence.png` 보고 P > G > M 순서 확인
+2. `data/fig1_delay_vs_users_*.csv` 보고 |U|=3000, |U|=7000에서 % 개선 계산
+3. **만약 결과 좋으면**: HP sweep 다시 (재학습 후 train.py 변경됐으니까)
+   ```bash
+   python run_hp_sweep.py --episodes 100 --device cuda
+   ```
+4. **만약 결과 나쁘면**: rollback (아래 Section 6)
+
+### Phase 6: §5 텍스트 수치 업데이트 (`section5_simulation.tex`)
+- §5.B Convergence: Proposed/GRLR/MADRL 수렴값 (예전: 0.49/0.42)
+- §5.D E2E Delay/PLR/TP: |U|=3000에서의 % 개선
+- §5.E Scalability: |U|=7000에서의 % 개선
+- §5.F Ablation: Proposed-NoBias 수치
 - §5.G Path Comparison: hop count, total distance, avg ISL capacity
-- Table II: $w_v$, $w_d$ 학습된 값
+- Table II: $w_v$, $w_d$ 학습된 값 (현재 paper: 0.89, 1.17)
 
-## 현재 paper-final 백업 위치
-**문제 생기면 복구할 곳**:
-- `backup_paper_snapshot_20260506/` — 코드, 데이터, figure, tex 전부 (가장 최근, 풀 스냅샷)
-- `backup_before_ablation_20260504/` — 그 이전 paper-final
-- `logs/backup_20260427/` — training 데이터 (오래된 백업)
+## 6. Rollback (만약 retrain 결과 나쁘면)
 
-## Section 5 현재 상태
-`section5_simulation.tex`는 **이전 백업 결과 기반**으로 작성됨. 재학습 끝나면 §5.B만 GRLR 포함으로 업데이트했고 (현재 데이터 기준), 나머지는 backup 수치 그대로. **재학습 후 전부 재검증/업데이트 필요.**
+### 빠른 복원 (script로)
+```bash
+# bash
+bash rollback_paper_final.sh
+
+# PowerShell
+.\rollback_paper_final.ps1
+```
+이러면 backup_paper_snapshot_20260506/에서 .py, .pt, .npy, figures, CSV, .tex 모두 복원.
+
+### git으로 hard rollback (commit history도 paper-snapshot으로)
+```bash
+git reset --hard paper-snapshot-20260506
+# 주의: 이후 커밋 모두 사라짐 (untracked 파일은 보존)
+```
+
+## 7. 디렉토리 구조 (정리됨)
+
+```
+LEO_Transformer_MARL/
+├── .gitignore                    # __pycache__/, /checkpoints/, /logs/{*.log,*.npy} 제외
+├── CLAUDE.md                     # 프로젝트 가이드
+├── NEXT_SESSION_BRIEF.md         # 이 파일 (always start here)
+├── PROJECT_GUIDE.md              # 전체 프로젝트 맥락
+├── REVIEWER_DEFENSE_TODO.md      # 리뷰어 방어용 추가 결과 list
+├── section5_simulation.tex       # 논문 Section 5
+├── rollback_paper_final.{sh,ps1} # 한 줄로 rollback
+│
+├── config.py                     # SEED=7
+├── train.py / train_grlr.py / train_madrl.py
+├── evaluate.py
+├── plot_paper_figures.py / plot_path_comparison.py / plot_ablation.py
+├── run_all.py / launch_training.py / auto_finish.py
+│
+├── environment/leo_env.py        # ① + ③ 변경 적용
+├── models/transformer_actor.py   # ② 변경 적용
+├── models/{maac,grlr,critic}.py
+├── algorithms/ppo_ctde.py
+├── routing/{stsd,dlbh}.py
+│
+├── checkpoints/                  # ⚠️ 학습 중 overwrite. paper-final은 backup에
+├── logs/                         # ⚠️ runtime 로그 + reward .npy
+├── figures/                      # 학습 끝나면 갱신됨
+├── data/                         # CSV outputs
+│
+└── backup_paper_snapshot_20260506/   # ⭐ rollback point (모든 paper-final 포함)
+    ├── checkpoints/   (best_*.pt)
+    ├── code/          (paper-final .py)
+    ├── data/          (CSV)
+    ├── figures/       (paper-final .png/.eps)
+    ├── logs/          (.npy reward histories)
+    └── tex/           (section5 + project_guide)
+```
+
+## 8. Quick monitoring snippet
+
+새 세션 시작하면 가장 먼저 이거 한 번 돌려서 상태 파악:
+
+```bash
+cd "c:/Users/yoon/Documents/Python Scripts/LEO_Transformer_MARL"
+echo "=== Process ===" && tasklist | grep -i python
+echo "=== Last training step ===" && tail -3 logs/train_proposed.log
+echo "=== Pipeline stage ===" && tail -3 logs/pipeline.log
+echo "=== Reward log (if final step done) ===" && ls -la logs/*_rewards.npy 2>/dev/null
+```
